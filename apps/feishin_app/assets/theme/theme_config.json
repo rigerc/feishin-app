@@ -1,0 +1,31 @@
+{
+  "light": {
+    "seed": "#236B55",
+    "surface": "#F8F9F7",
+    "onSurface": "#19201E",
+    "onSurfaceVariant": "#515C57",
+    "surfaceContainerLow": "#EFF2EE",
+    "surfaceContainer": "#E8EDE8",
+    "surfaceContainerHigh": "#E1E8E2",
+    "surfaceContainerHighest": "#D8E1D9",
+    "outlineVariant": "#CCD6CE"
+  },
+  "dark": {
+    "seed": "#A4E6C8",
+    "primary": "#A4E6C8",
+    "onPrimary": "#10382A",
+    "surface": "#101413",
+    "onSurface": "#F0F5F1",
+    "onSurfaceVariant": "#B0BFB8",
+    "surfaceContainerLowest": "#0C100F",
+    "surfaceContainerLow": "#151A18",
+    "surfaceContainer": "#1B2320",
+    "surfaceContainerHigh": "#26302C",
+    "surfaceContainerHighest": "#303D36",
+    "secondaryContainer": "#303F37",
+    "onSecondaryContainer": "#D9EDE1",
+    "outline": "#86948C",
+    "outlineVariant": "#38463E"
+  },
+  "shape": {"button": 28, "chip": 24, "card": 16, "input": 16, "sheet": 24}
+}

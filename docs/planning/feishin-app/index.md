@@ -1,6 +1,6 @@
 # feishin-app planning package
 
-**Review status:** Product direction confirmed. Design, architecture and implementation approval pending. Research snapshot 23 November 2026.
+**Review status:** Product direction confirmed and implementation approved. Validation is in progress. Research snapshot 23 November 2026.
 
 feishin-app is a Material 3 Flutter remote for Feishin desktop on Android. The first release connects through Feishin Remote using trusted LAN by default, with WSS available. Now Playing is the default start screen, and Settings can switch it to Library. The first release covers in-app playback controls, browsing, queue editing, standard and generated seeking, and artwork, device and static backgrounds. Playback stays usable with placeholder artwork. Feishin v1.17.0 is the initial desktop compatibility candidate. Real waveforms and Android system media controls are later investigations.
 

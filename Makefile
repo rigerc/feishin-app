@@ -8,12 +8,12 @@
 FLUTTER ?= fvm flutter
 DART ?= fvm dart
 
-APPS = apps/jokes apps/doc_scanner apps/ai_chat apps/ecommerce/gravia
-GEN_PACKAGES = packages/core apps/jokes apps/doc_scanner apps/ai_chat
+APPS = apps/feishin_app apps/jokes apps/doc_scanner apps/ai_chat apps/ecommerce/gravia
+GEN_PACKAGES = apps/feishin_app packages/core apps/jokes apps/doc_scanner apps/ai_chat
 
 # web-terminal collides with the web-terminal/ directory, so targets must be
 # declared phony or make treats them as up-to-date files.
-.PHONY: setup run-jokes run-doc-scanner run-ai-chat run-design-gallery \
+.PHONY: setup run-feishin run-jokes run-doc-scanner run-ai-chat run-design-gallery \
         run-gravia web-jokes web-doc-scanner web-ai-chat web-design-gallery \
         web-gravia console terminal-bridge dev-web-terminal analyze test gen \
         clean docker-build docker-up ws-image ws-create ws-delete
@@ -23,6 +23,9 @@ setup:
 	$(FLUTTER) pub get
 
 # --- run a specific app ---
+run-feishin:
+	cd apps/feishin_app && $(FLUTTER) run
+
 run-jokes:
 	cd apps/jokes && $(FLUTTER) run
 

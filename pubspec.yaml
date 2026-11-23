@@ -10,6 +10,7 @@ environment:
 # and edits to packages/core are picked up live by any running app.
 workspace:
   - packages/core
+  - apps/feishin_app
   - apps/jokes
   - apps/doc_scanner
   - apps/ai_chat

@@ -1,6 +1,6 @@
 # H. Confirmed decisions and approval checkpoint
 
-The product direction below was confirmed in the planning interview. The revised design and architecture are ready for review. Implementation requires separate approval.
+The product direction below was confirmed in the planning interview. The user subsequently approved implementation. Beads records this decision in feishin-app-ag3.1.
 
 | Decision | Confirmed direction and implications |
 | --- | --- |
@@ -15,4 +15,4 @@ Desktop playback and the live queue remain authoritative. Radio is excluded.
 
 ## Implementation review
 
-Review the confirmed product decisions alongside the proposed Material 3 design, single remote session, typed WebSocket adapter and feature BLoCs. The first engineering milestone after approval is live Feishin Remote and Android validation, followed by the connection and playback slice. [Feature spec](B-features.md) · [UX](C-ux.md) · [Architecture](D-architecture.md) · [Roadmap](G-roadmap.md)
+The approved implementation starts with validation of Feishin Remote and Android, alongside the connection and playback slice. [Feature spec](B-features.md) · [UX](C-ux.md) · [Architecture](D-architecture.md) · [Roadmap](G-roadmap.md)
