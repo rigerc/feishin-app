@@ -86,6 +86,10 @@ Run `make gen` after changing any `@freezed` or `@JsonSerializable` file. Never 
 
 ---
 
+## New Screens
+
+Before building a new screen from scratch, search Flutter Templates with `search_widgets` or `fluttertemplates search "<query>"` and show the user the closest matches. Add the selected template to the target app with `add_widget` or `fluttertemplates add <id>`. If the CLI cannot be installed, find the screen in [the catalog index](https://fluttertemplates.dev/llms.txt) and copy its linked source, including its license notice. Adapt the screen to the app's theme and project architecture, then run `make analyze` from the workspace root.
+
 ## Forbidden Patterns
 
 - Hardcoded colours, strings, spacing, or radii in widget files
