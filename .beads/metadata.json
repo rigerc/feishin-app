@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "feishin_app",
+  "project_id": "3713dda6-51aa-43db-ad45-a793dcc9fb32"
+}

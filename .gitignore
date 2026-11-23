@@ -98,3 +98,10 @@ code-export/
 /.agnostic-ai/packs/
 /agnostic-ai.local.yaml
 # <<< agnostic-ai (managed) <<<
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
+*.gate.lock*

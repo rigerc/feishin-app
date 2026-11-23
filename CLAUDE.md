@@ -181,6 +181,10 @@ When the user asks about running the project locally, follow the checklist in `d
 
 ---
 
+## Issue Tracking
+
+Use Beads (`bd`) to track project issues. Run `bd prime` for the project workflow and `bd ready` to find unblocked issues.
+
 ## Maintaining agent instructions
 
 Edit shared instructions in `.agnostic-ai/AGNOSTIC_AI.md`, scoped rules in `.agnostic-ai/rules/`, and skills in `.agnostic-ai/skills/`. Run `agnostic-ai sync` and include the generated files with the source changes. See `docs/explanation/ai-agents.md` for the generated tool paths.
