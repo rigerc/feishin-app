@@ -1,0 +1,38 @@
+# B. Feature specification
+
+feishin-app controls a selected Feishin desktop from an Android phone or tablet. The desktop plays the music and owns authoritative playback and queue state. Profile settings and rendering preferences belong to the phone. MVP uses one active Feishin Remote connection with quick switching among saved desktop profiles. Library and playback operations go through Feishin, which manages its own backend.
+
+**Support labels.** Direct includes the existing Remote API and local Flutter features requiring no additional service. Android means Android-specific implementation. External requires or depends on an optional separate service. Extension requires an upstream contract change. Excluded covers deliberate omissions or behavior the available contracts cannot guarantee.
+
+| ID | Feature and support | User-visible outcome and acceptance |
+| --- | --- | --- |
+| C1 | Direct · MVP · manual host, port, WebSocket auth and connection test | Enter host and default port 4333 for the trusted LAN option or select encrypted WSS. Explain cleartext before connecting and accept Feishin credentials when configured. Test succeeds after a parsed desktop snapshot. Bad credentials, local permission and connection failures offer distinct recovery where the failure is identifiable |
+| C2 | Direct · MVP · multiple profiles and reconnect | Save, edit, delete and switch named profiles. Preserve the last selected profile across app restarts. A Wi-Fi break disables mutations, resumes with fresh snapshots and never replays operations. Explicit disconnect suppresses auto-retry |
+| P1 | Direct · MVP · transport and synchronization | Play/pause/previous/next, repeat cycle and shuffle follow desktop pushes, including changes made on the desktop. Show track, artist, album, remote target and playing/paused/stopped state |
+| P2 | Direct · MVP · volume and seek | Set desktop volume independently of the phone. Standard and generated seek styles share a verified seconds-based seek contract. Scrubbing uses local preview without disrupting desktop playback before release |
+| P3 | Direct conditional · MVP · track favorite/rating | Current-track favorite and supported rating appear when compatibility is established. Confirm via the desktop push, show pending and time out visibly. Absent rating differs from supported unrated state. Do not expose bulk or noncurrent rating actions |
+| P4 | Direct conditional · MVP · artwork and image fallback | Show current and catalog images where reachable, with a fixed-size themed placeholder when missing or denied. Use the fallback background and keep supported playback controls usable if artwork is unavailable |
+| L1 | Direct · MVP · tracks, albums and playlists | Browse and search one library entity type at a time, retain category location, paginate with retry. Duplicate catalog results render once. Search is per backend. Plain Subsonic browsing can be sampled rather than exhaustive |
+| L2 | Direct · MVP · Play now, Play next, Add to queue | Use existing play events with `now`, `next`, `last`. Confirm when replacement is destructive according to the documented UX, then reflect desktop queue changes. An ack alone does not establish that album/playlist playback changed |
+| L3 | Direct conditional · MVP · add track to existing playlist | Choose an existing playlist with the remote picker, then send IDs. Handle the backend's edit verdict. No editable-only filter or new-playlist action is promised |
+| Q1 | Direct · MVP · live queue and duplicate entries | Display active occurrence, preceding queue items where available, and upcoming items in desktop order. Jumping to the second copy of a song selects its exact queue occurrence |
+| Q2 | Direct · MVP · reorder, remove and clear | Reorder relative to an entry, remove one entry, or confirm clear. New desktop snapshot wins over optimistic presentation. Cancelling confirmation causes no mutation. Removing the active entry receives a confirmation when supported by the device matrix |
+| S1 | Direct · MVP · global preferences | Central Settings for connections, Material theme, player background, waveform, playback, Android integration status, storage and diagnostics. Persist applicable controls across restart. Start screen is selectable in Settings, with Now Playing as the default and Library as an option. Advanced features appear once available |
+| S2 | Direct · MVP / enhanced · dynamic background | Artwork, device palette and static modes. MVP provides presets, contrast treatment and motion control. Enhanced adds custom colors, saturation, darkness, blur, intensity, transition tuning |
+| S3 | Direct · MVP / enhanced · waveform appearance | Standard or Generated style, live preview, density and color presets, haptic and reduced-motion settings in MVP. Enhanced adds independent dimensions, shapes, colors, playhead and smoothing controls |
+| W1 | External · enhanced conditional · real peaks | Later investigation of opt-in self-hosted peaks or bounded analysis of authorized Navidrome audio. Standard and Generated use Feishin Remote timing with no separate audio source in MVP. Auto is cache-first. Source label and fallback accurately reflect the result. No local audio output |
+| N1 | Android · enhanced conditional · media surfaces and headset | Play/pause/previous/next and seek when available through a real remote MediaSession. Disconnected, stale, denied or process-dead behavior is validated on physical devices. Show only on validated surfaces |
+| N2 | Android · future · widgets and Wear OS | Timestamped snapshot or open-app shortcut first. Add bounded remote actions only if lifecycle is reliable |
+| N3 | Android · future · Android Auto | Feasibility review conditional on supported app category, value in a car, privacy and driving UX |
+| X1 | Extension · future candidates | Album/playlist tracks and detail, artists, ownership/capabilities, reliable operation errors, revisions and track-scoped seek require additional Feishin contract or an independently approved backend integration |
+| X2 | Excluded | No radio functionality, local audio playback, audio routing/casting, music downloads for offline listening, or queued offline mutations. No support claim for global search, mobile volume keys controlling desktop volume or generic headset dispatch |
+| X3 | Excluded with current contract | Exact seek confirmation and conflict-free, atomic conditional queue updates. Current protocol lacks IDs/revisions for those operations |
+
+## Shared rules and states
+
+- Connected-empty, stale, loading, unknown duration and unsupported capability are separate states. No optimistic success announcement without observable evidence. Offline snapshots remain read-only and visibly stale for the current session only. Profile switches discard the previous profile's temporary state.
+- Transient network failures can be retried or recovered, while deterministic credential, permission and invalid endpoint failures require a user action. Operations in doubt are presented as uncertain, with desktop state available for inspection.
+- Backend selection lives on the desktop. App profiles select a desktop. Use backend information only when evidenced by current song or explicitly verified from compatibility rules. A connected desktop may still have no usable library.
+- Snapshot results for a successful request with no rows can represent a genuinely empty catalog, no matching items, or a failed desktop backend fetch. Provide the same helpful next actions without claiming which occurred.
+
+Evidence and verification. [A. Research](A-research.md) · [G. Roadmap](G-roadmap.md)
