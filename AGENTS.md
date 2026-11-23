@@ -12,7 +12,7 @@ Read before writing or modifying any code:
 - `docs/explanation/end-goal.md` — project vision and guiding principles
 
 Read on demand:
-- `docs/reference/feishin/README.md` — Feishin Remote API events, schemas, and client example
+- For the Feishin Remote API, read `docs/reference/feishin/docs/API.md`. The bundle index at `docs/reference/feishin/README.md` lists the schemas and client example.
 - `docs/how-to/contributing.md` — contributor workflow and git hooks
 - `docs/how-to/add-feature-template.md` — full folder tree, empty class skeletons, DI wiring, and forbidden-pattern checklist for scaffolding a new feature
 - `docs/how-to/add-usecase.md` — create a use case class and register it in `injection_container.dart`
