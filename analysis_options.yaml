@@ -15,6 +15,9 @@ analyzer:
     # are not ours to analyze — keep the PROBLEMS panel about our code only.
     - "build/**"
     - "**/build/**"
+    # Imported source from a separate Flutter package.
+    - "docs/reference/feishin-remote/**"
+    - "plugins/flutter-agentic/docs/reference/feishin-remote/**"
 
 linter:
   # The lint rules applied to this project can be customized in the

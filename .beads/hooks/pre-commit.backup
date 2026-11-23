@@ -11,7 +11,8 @@
 # (it lives in Homebrew's bin). Add the usual locations as a fallback.
 command -v fvm >/dev/null 2>&1 || PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.dart$')
+# Preserve the imported reference files byte for byte.
+STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.dart$' | grep -v '^docs/reference/feishin-remote/')
 
 if [ -n "$STAGED" ]; then
   fvm dart format $STAGED
