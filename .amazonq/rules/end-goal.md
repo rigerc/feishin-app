@@ -1,1 +1,0 @@
-../../docs/explanation/end-goal.md

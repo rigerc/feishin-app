@@ -1,1 +1,0 @@
-../../docs/how-to/design-screen-state.md

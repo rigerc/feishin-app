@@ -83,16 +83,7 @@ package:{OldPackage}/   →   package:{NewPackage}/
 
 ## 8. AI rules and docs
 
-Run a global find-and-replace on these files:
-- `CLAUDE.md`
-- `AGENTS.md`
-- `GEMINI.md`
-- `.github/copilot-instructions.md`
-- `.amazonq/rules/` (if present)
-- `.cursor/rules/` (if present)
-- `docs/` (all `.md` files)
-- `.claude/skills/` (all `SKILL.md` files)
-- `.codex/skills/` (all `SKILL.md` files)
+Update references under `.agnostic-ai/` and `docs/`. Check the standalone instructions in `GEMINI.md` and `.github/copilot-instructions.md` for app-specific references. Run `agnostic-ai sync` to regenerate the managed instructions.
 
 Replace all three forms:
 ```

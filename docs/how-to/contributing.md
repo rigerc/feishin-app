@@ -30,29 +30,16 @@ The commit is **blocked** if any issue is found. Fix the issues and re-commit.
 
 ## AI agent rule files
 
-All agents load context from explicit pointers — no generated files, no sync scripts.
-When a new doc is added to `docs/`, add a named pointer to each agent config so agents
-know it exists and when to read it.
+Edit `.agnostic-ai/AGNOSTIC_AI.md` for shared instructions, `.agnostic-ai/rules/` for scoped rules, and `.agnostic-ai/skills/` for shared skills. To add a reference all agents should see, add a pointer in the shared instructions.
 
-| Agent file | Agent | How context loads |
-|---|---|---|
-| `CLAUDE.md` | Claude Code | `@` eagerly loads conventions, architecture, end-goal |
-| `.claude/skills/setup-project/SKILL.md` | Claude Code | `/setup-project` command |
-| `GEMINI.md` | Gemini CLI | `@` eagerly loads conventions, architecture, end-goal, setup |
-| `AGENTS.md` | Android Studio · Codex CLI | Inline conventions; named pointers to architecture, end-goal |
-| `.cursor/rules/conventions.mdc` | Cursor | Inline conventions + named doc pointers, `alwaysApply: true` |
-| `.cursor/rules/setup-project.mdc` | Cursor | `alwaysApply: false` — auto on setup questions |
-| `.codex/skills/setup-project/SKILL.md` | Codex CLI | `$setup-project` command |
-| `.amazonq/rules/conventions.md` | Amazon Q | Symlink → `docs/ai-rules/conventions.md` |
-| `.amazonq/rules/architecture.md` | Amazon Q | Symlink → `docs/reference/architecture.md` |
-| `.amazonq/rules/end-goal.md` | Amazon Q | Symlink → `docs/explanation/end-goal.md` |
-| `.amazonq/rules/setup-project.md` | Amazon Q | Symlink → `docs/ai-rules/setup-project.md` |
+Generate the native files and check for drift before committing:
 
-**To update conventions:** edit `docs/ai-rules/conventions.md`.
-**To update setup checklist:** edit `docs/ai-rules/setup-project.md`.
-**To add a doc all agents see:** add it under `docs/`, add a named pointer in each agent config file listed above, and create a symlink in `.amazonq/rules/` pointing to it.
+```bash
+agnostic-ai sync
+agnostic-ai sync --check
+```
 
-See `docs/explanation/ai-agents.md` for per-agent install and usage instructions.
+Commit the source changes with the generated files so contributors can use their agents after cloning. See `docs/explanation/ai-agents.md` for the generated tool paths.
 
 ---
 

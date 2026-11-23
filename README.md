@@ -11,7 +11,7 @@
 
 [View releases →](https://github.com/abhinav503/flutter-agentic/releases)
 
-FlutterAgentic gives Flutter developers a production-grade Clean Architecture foundation that AI coding agents can actually follow. Fork it, open it in Claude Code, Codex, GitHub Copilot, Cursor, Gemini, Android Studio, or Amazon Q, and the agent gets the same architecture rules, forbidden patterns, naming conventions, test expectations, and feature scaffolding docs that a human teammate would use.
+FlutterAgentic gives Flutter developers a production-grade Clean Architecture foundation that AI coding agents can actually follow. Fork it, open it in Claude Code, Codex, Pi, OpenCode, GitHub Copilot, Gemini, or Android Studio, and the agent gets the same architecture rules, forbidden patterns, naming conventions, test expectations, and feature scaffolding docs that a human teammate would use.
 
 Most Flutter starters give you folders. FlutterAgentic gives you a rulebook plus a runnable app structure, so AI-generated code is less likely to drift into random widgets, leaked DTOs, untestable state, or inconsistent feature layouts.
 
@@ -90,7 +90,7 @@ FlutterAgentic is the handbook. Every agent that opens this repo gets the same r
 ```mermaid
 flowchart LR
     subgraph Agents["🤖 AI Agents"]
-        A["Claude Code\nGitHub Copilot\nCursor · Codex\nGemini · Amazon Q"]
+        A["Claude Code · Codex\nPi · OpenCode\nGitHub Copilot · Gemini"]
     end
 
     subgraph FA["📦 FlutterAgentic"]
@@ -110,17 +110,17 @@ flowchart LR
 
 ## AI Agent Support
 
-FlutterAgentic includes repo-native instructions for Claude Code, Codex CLI, Cursor, Gemini, Android Studio, GitHub Copilot, and Amazon Q.
+agnostic-ai generates shared instructions and skills for Claude Code, Codex CLI, Pi, and OpenCode. The repo also includes instructions for Gemini, Android Studio, and GitHub Copilot.
 
 | Agent | Instruction source | Setup / scaffold path |
 |---|---|---|
 | <img alt="Claude Code" src="https://img.shields.io/badge/Claude_Code-191919?logo=anthropic&logoColor=white" /> | `CLAUDE.md` | `/setup-project`, `/add-feature-template` |
 | <img alt="Codex CLI" src="https://img.shields.io/badge/Codex_CLI-111827?logo=openai&logoColor=white" /> | `AGENTS.md` + `.codex/skills/` | `$setup-project`, `$add-feature-template <name>` |
+| Pi | `AGENTS.md` + `.pi/skills/` | Ask to run `setup-project` or `add-feature-template` |
+| OpenCode | `AGENTS.md` + `.opencode/skills/` | Ask to run `setup-project` or `add-feature-template` |
 | <img alt="GitHub Copilot" src="https://img.shields.io/badge/GitHub_Copilot-181717?logo=githubcopilot&logoColor=white" /> | `.github/copilot-instructions.md` | Repo-wide instructions; path-specific instructions can live in `.github/instructions/` |
-| <img alt="Cursor" src="https://img.shields.io/badge/Cursor-000000?logo=cursor&logoColor=white" /> | `.cursor/rules/` | Ask to set up or scaffold a feature |
 | <img alt="Gemini CLI" src="https://img.shields.io/badge/Gemini_CLI-4285F4?logo=googlegemini&logoColor=white" /> | `GEMINI.md` | Ask to set up or scaffold a feature |
 | <img alt="Android Studio" src="https://img.shields.io/badge/Android_Studio-3DDC84?logo=androidstudio&logoColor=111827" /> | `AGENTS.md` | Ask to set up or scaffold a feature |
-| <img alt="Amazon Q" src="https://img.shields.io/badge/Amazon_Q-232F3E?logo=amazonwebservices&logoColor=white" /> | `.amazonq/rules/` | Rules are loaded from the repo |
 
 Available skills:
 
@@ -148,7 +148,7 @@ FlutterAgentic is built for developers who want:
 - Dio networking via a single `HttpService` with repository-level failure mapping
 - GoRouter navigation and a central DI graph
 - Design tokens and reusable UI atoms instead of hardcoded styling
-- Agent instructions for Claude, Codex, Copilot, Cursor, Gemini, Android Studio, and Amazon Q
+- Agent instructions for Claude, Codex, Pi, OpenCode, Copilot, Gemini, and Android Studio
 - A repeatable path for adding features without asking the AI to invent structure
 - A local web console (`web-terminal/`) that lets you prompt, preview, visually edit, and browse generated code from one browser tab — **without installing Xcode or Android Studio first**
 

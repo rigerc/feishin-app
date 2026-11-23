@@ -1,32 +1,19 @@
 # AI Coding Agents
 
-This project is configured for six AI coding agents. Each one automatically picks up
-project conventions, architecture, and documentation on every prompt.
+FlutterAgentic uses agnostic-ai for Claude Code, Codex CLI, Pi, and OpenCode. These tools share the project rules and workflows from one source.
 
----
+## Updating instructions
 
-## How context loads
+- Edit shared instructions in `.agnostic-ai/AGNOSTIC_AI.md`.
+- Edit directory-specific rules in `.agnostic-ai/rules/` and shared skills in `.agnostic-ai/skills/`.
+- Use the version in `agnostic-ai.yaml`, run `agnostic-ai sync` and `agnostic-ai sync --check`, then commit the specs and native outputs together.
 
-Each agent reads instruction files that eagerly load high-signal docs and name the rest:
-1. **Always in context** — conventions, architecture, end-goal
-2. **Named for on-demand fetch** — contributing guide, this file
-
-Conventions and architecture shape every coding decision so they pay their token cost on every request. The others are situational.
-
-### Updating shared docs — inline vs reference
-
-The canonical docs are `docs/ai-rules/conventions.md` and `docs/reference/architecture.md`. Agents consume them two ways. **When you change a canonical doc, update the inline copies in the same commit** — referencing agents are automatic, inlining agents are not.
-
-| Agent | How it loads the docs | On a doc change |
-|---|---|---|
-| Claude Code (`CLAUDE.md`) | `@docs/...` import | ✅ automatic |
-| Gemini CLI (`GEMINI.md`) | `@docs/...` import | ✅ automatic |
-| Amazon Q (`.amazonq/rules/`) | symlinks the docs | ✅ automatic |
-| Cursor (`.cursor/rules/conventions.mdc`) | self-contained copy | ⚠️ edit this file too |
-| Copilot (`.github/copilot-instructions.md`) | self-contained copy | ⚠️ edit this file too |
-| Codex / Android Studio (`AGENTS.md`) | self-contained copy | ⚠️ edit this file too |
-
-The three self-contained files only **name** the canonical doc path as prose — they don't pull its content — so they carry their own condensed `Forbidden Patterns` list that drifts unless hand-synced.
+| Target | Generated instructions and skills |
+|---|---|
+| Claude Code | `CLAUDE.md`, `.claude/rules/`, `.claude/skills/` |
+| Codex CLI | `AGENTS.md`, scoped `AGENTS.md`, `.codex/skills/` |
+| Pi | `AGENTS.md`, scoped `AGENTS.md`, `.pi/skills/` |
+| OpenCode | `AGENTS.md`, scoped `AGENTS.md`, `.opencode/skills/` |
 
 ---
 
@@ -47,23 +34,10 @@ claude login
 claude
 ```
 
-**How context loads** — `CLAUDE.md` is auto-loaded on every session. It eagerly loads `docs/ai-rules/conventions.md`, `docs/reference/architecture.md`, and `docs/explanation/end-goal.md`. Contributing and agent guides are named for on-demand fetch.
+**How context loads** — `CLAUDE.md` is auto-loaded on every session. It includes the shared conventions and imports `docs/reference/architecture.md` and `docs/explanation/end-goal.md`.
 
 **Setup skill** — run `/setup-project` to check all prerequisites.
 **Scaffold skill** — run `/add-feature-template` (or `/add-feature-template <name>`) to scaffold a new feature.
-
----
-
-## Cursor
-
-**Install** — Download from [cursor.com](https://cursor.com)
-
-**Usage** — Open the project folder in Cursor. Switch to Agent mode in the chat panel.
-
-**How context loads** — `.cursor/rules/conventions.mdc` has `alwaysApply: true` so it is included in every Agent request. It contains conventions and named pointers to `docs/reference/architecture.md` and `docs/explanation/end-goal.md`.
-
-**Setup skill** — ask *"help me set up this project"*.
-**Scaffold skill** — ask *"scaffold a products feature"*.
 
 ---
 
@@ -84,7 +58,7 @@ gemini auth login
 gemini
 ```
 
-**How context loads** — `GEMINI.md` is auto-loaded at session start. It eagerly loads conventions, architecture, and end-goal via `@` imports.
+**How context loads** — `GEMINI.md` imports the conventions, architecture, and end-goal docs via `@`.
 
 **Setup skill** — ask *"help me set up this project"*.
 **Scaffold skill** — ask *"scaffold a products feature"*.
@@ -128,40 +102,14 @@ codex
 
 ---
 
-## Amazon Q Developer
-
-**Install (CLI)**
-```bash
-brew install amazon-q   # macOS
-# or download from https://aws.amazon.com/q/developer/
-```
-
-**Install (IDE)** — VS Code or JetBrains → Extensions → search *Amazon Q*.
-
-**Auth**
-```bash
-q login
-```
-
-**Usage** — run in the project root:
-```bash
-q chat
-```
-
-**How context loads** — all files in `.amazonq/rules/` are auto-loaded on every interaction. `instructions.md` points to all key docs; `review-code.md` and `change-app-id.md` provide specialised rules for those tasks.
-
-**Setup skill** — ask *"help me set up this project"*.
-**Scaffold skill** — ask *"scaffold a products feature"*.
-
----
-
 ## Quick comparison
 
 | Agent | Instruction file | Setup trigger | Scaffold trigger |
 |---|---|---|---|
 | Claude Code | `CLAUDE.md` | `/setup-project` | `/add-feature-template` |
-| Cursor | `.cursor/rules/conventions.mdc` | Ask about setup | Ask to scaffold a feature |
 | Gemini CLI | `GEMINI.md` | Ask about setup | Ask to scaffold a feature |
 | Android Studio | `AGENTS.md` | Ask about setup | Ask to scaffold a feature |
 | Codex CLI | `AGENTS.md` | `$setup-project` | `$add-feature-template` |
-| Amazon Q | `.amazonq/rules/` (all files) | Ask about setup | Ask to scaffold a feature |
+| Pi | `AGENTS.md` and `.pi/skills/` | Ask to run the `setup-project` skill | Ask to run the `add-feature-template` skill |
+| OpenCode | `AGENTS.md` and `.opencode/skills/` | Ask to run the `setup-project` skill | Ask to run the `add-feature-template` skill |
+| GitHub Copilot | `.github/copilot-instructions.md` | Ask about setup | Ask to scaffold a feature |

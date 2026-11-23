@@ -179,19 +179,4 @@ When the user asks about running the project locally, setting up their environme
 
 ## Maintaining agent instructions
 
-This repo serves **7 AI agents** across **6 instruction surfaces** (Codex CLI + Android Studio share `AGENTS.md`). The canonical rule docs are `docs/ai-rules/conventions.md` and `docs/reference/architecture.md`.
-
-When you change a shared rule, update **every** surface in the same commit:
-
-| Surface | Agent(s) | Picks up canonical-doc edits |
-|---|---|---|
-| `CLAUDE.md` | Claude Code | ✅ auto (`@docs/…` import) |
-| `GEMINI.md` | Gemini CLI | ✅ auto (`@docs/…` import) |
-| `.amazonq/rules/` | Amazon Q | ⚠️ hybrid — plain rule docs are **symlinks** into `docs/` (auto-sync); per-skill files are **self-contained copies** (hand-sync, drift). Amazon Q reads symlink targets but cannot follow `@docs/…` prose references |
-| `.cursor/rules/conventions.mdc` | Cursor | ⚠️ hand-sync — self-contained copy |
-| `.github/copilot-instructions.md` | GitHub Copilot | ⚠️ hand-sync — self-contained copy |
-| `AGENTS.md` | Codex CLI, Android Studio | ⚠️ hand-sync — self-contained copy |
-
-The three ⚠️ files only **name** the doc path as prose; they carry their own condensed copy that drifts unless edited directly. Full per-agent detail: `docs/explanation/ai-agents.md`.
-
-**Skills live in two parallel trees — keep them in sync.** Both Claude Code (`.claude/skills/`) and Codex CLI (`.codex/skills/`) read per-skill `SKILL.md` folders, but in different formats: Claude skills are thin (body + `@docs/…` import), Codex skills are **self-contained inline** (full content with YAML frontmatter, since Codex can't follow `@docs/…`). When you add, remove, or rename a skill, update **both** trees in the same commit — `.codex/skills/` does not inherit `.claude/skills/` edits — and add the matching self-contained `.amazonq/rules/<skill>.md`. A skill that exists in only one tree is the most common drift; verify with `ls .claude/skills .codex/skills`.
+Update shared guidance in `.agnostic-ai/AGNOSTIC_AI.md` and the relevant project docs. Run `agnostic-ai sync` to regenerate the managed agent files. Update this standalone Copilot file when its guidance changes.
