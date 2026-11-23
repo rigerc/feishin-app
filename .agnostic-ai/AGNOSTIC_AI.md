@@ -15,6 +15,7 @@ Read before writing or modifying any code:
 - `docs/explanation/end-goal.md` — project vision and guiding principles
 
 Read on demand:
+- `docs/reference/feishin/README.md` — Feishin Remote API events, schemas, and client example
 - `docs/how-to/contributing.md` — contributor workflow and git hooks
 - `docs/how-to/add-feature-template.md` — full folder tree, empty class skeletons, DI wiring, and forbidden-pattern checklist for scaffolding a new feature
 - `docs/how-to/add-usecase.md` — create a use case class and register it in `injection_container.dart`
@@ -84,9 +85,9 @@ The pre-commit hook formats staged Dart files and runs `flutter analyze` at the 
 
 ---
 
-## New Screens
+## Flutter Screens and Components
 
-Before building a new screen from scratch, search Flutter Templates with `search_widgets` or `fluttertemplates search "<query>"` and show the user the closest matches. Add the selected template to the target app with `add_widget` or `fluttertemplates add <id>`. If the CLI cannot be installed, find the screen in [the catalog index](https://fluttertemplates.dev/llms.txt) and copy its linked source, including its license notice. Adapt the screen to the app's theme and project architecture, then run `make analyze` from the workspace root.
+Before building a Flutter screen or UI component, search with Flutter Templates MCP (`search_widgets`) and show the user the closest matches. Use `add_widget` to add the selected component to the target app. If MCP is unavailable, use `fluttertemplates search "<query>"` and `fluttertemplates add <id>`. If the CLI cannot be installed, use [the catalog index](https://fluttertemplates.dev/llms.txt) and copy the linked source with its license notice. Adapt the component to the app's theme and project architecture, then run `make analyze` from the workspace root.
 
 ## Forbidden Patterns
 

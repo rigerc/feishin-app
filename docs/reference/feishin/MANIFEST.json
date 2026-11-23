@@ -1,0 +1,93 @@
+{
+  "bundle": "Feishin Remote API documentation & schemas",
+  "compiled": "2026-11-23",
+  "upstream_branch": "development",
+  "client_event_names": [
+    "add-to-playlist",
+    "albums-request",
+    "authenticate",
+    "clear-queue",
+    "favorite",
+    "next",
+    "pause",
+    "play",
+    "play-album",
+    "play-playlist",
+    "play-radio",
+    "play-track",
+    "play-track-radio",
+    "playlists-request",
+    "position",
+    "previous",
+    "proxy",
+    "queue-jump",
+    "radio-request",
+    "rating",
+    "remove-from-queue",
+    "reorder-queue",
+    "repeat",
+    "shuffle",
+    "tracks-request",
+    "volume"
+  ],
+  "server_event_names": [
+    "accent-color",
+    "albums-response",
+    "confirm-queue-changes-setting",
+    "error",
+    "favorite",
+    "operation-ack",
+    "playback",
+    "playlists-response",
+    "position",
+    "proxy",
+    "queue-state",
+    "radio-response",
+    "radio-status",
+    "rating",
+    "repeat",
+    "shuffle",
+    "song",
+    "state",
+    "tracks-response",
+    "volume"
+  ],
+  "files": {
+    "README.md": {
+      "sha256": "6a7003aa3e9a4c3a114ce302c80599697e8dd7780c4102d07ab33bcfac820db9",
+      "bytes": 1653
+    },
+    "docs/API.md": {
+      "sha256": "c2a1a1a2d6944b2a7461548fe86801cddea5101970dc86d7333d168bdd2a579f",
+      "bytes": 8155
+    },
+    "docs/SCHEMAS.md": {
+      "sha256": "d17945e7e3966e069fad67f4fb108c421f52b505198fb7cc41b84aab203d5885",
+      "bytes": 2228
+    },
+    "examples/client.mjs": {
+      "sha256": "c6c7f2af9a7ae5c813f5eb5ad838f3cfed51aef1651312fd5a924e0caa9457fd",
+      "bytes": 1482
+    },
+    "schemas/client-events.schema.json": {
+      "sha256": "146cdaa821dfed341859bec347d53f68b9d245ceda407f79555d34114d0bf65c",
+      "bytes": 17697
+    },
+    "schemas/remote-protocol.d.ts": {
+      "sha256": "55a9bc2a5bd8d46216892350ac53f9a690c706d3e7153c981794214bc4aac13e",
+      "bytes": 4085
+    },
+    "schemas/remote-protocol.schema.json": {
+      "sha256": "4fac8fc8055b182eadef5109341042f2bf9e01fcba878a96ba375e3f3f92efbd",
+      "bytes": 30167
+    },
+    "schemas/server-events.schema.json": {
+      "sha256": "4c69e7e39a5bf84a78ae1dce9ae516b1c95572ceff3af2f3266022974f297b66",
+      "bytes": 19451
+    },
+    "sources/REFERENCES.md": {
+      "sha256": "ff234fc33702370b222df98bf423cad58e8d1c4d6adb4a0479203eea1a6a8012",
+      "bytes": 1161
+    }
+  }
+}

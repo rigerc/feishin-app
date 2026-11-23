@@ -1,0 +1,942 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/feishin-remote/server-events.schema.json",
+  "title": "Feishin Remote API — server messages",
+  "description": "Unofficial JSON Schema derived from the Feishin development-branch TypeScript definitions; verify against the installed version. QueueSong/SongState nested Song payloads are only partially constrained.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/Server01"
+    },
+    {
+      "$ref": "#/$defs/Server02"
+    },
+    {
+      "$ref": "#/$defs/Server03"
+    },
+    {
+      "$ref": "#/$defs/Server04"
+    },
+    {
+      "$ref": "#/$defs/Server05"
+    },
+    {
+      "$ref": "#/$defs/Server06"
+    },
+    {
+      "$ref": "#/$defs/Server07"
+    },
+    {
+      "$ref": "#/$defs/Server08"
+    },
+    {
+      "$ref": "#/$defs/Server09"
+    },
+    {
+      "$ref": "#/$defs/Server10"
+    },
+    {
+      "$ref": "#/$defs/Server11"
+    },
+    {
+      "$ref": "#/$defs/Server12"
+    },
+    {
+      "$ref": "#/$defs/Server13"
+    },
+    {
+      "$ref": "#/$defs/Server14"
+    },
+    {
+      "$ref": "#/$defs/Server15"
+    },
+    {
+      "$ref": "#/$defs/Server16"
+    },
+    {
+      "$ref": "#/$defs/Server17"
+    },
+    {
+      "$ref": "#/$defs/Server18"
+    },
+    {
+      "$ref": "#/$defs/Server19"
+    },
+    {
+      "$ref": "#/$defs/Server20"
+    }
+  ],
+  "$defs": {
+    "Play": {
+      "type": "string",
+      "enum": [
+        "index",
+        "last",
+        "lastShuffle",
+        "next",
+        "nextShuffle",
+        "now",
+        "shuffle"
+      ]
+    },
+    "PlayerRepeat": {
+      "type": "string",
+      "enum": [
+        "all",
+        "none",
+        "one"
+      ]
+    },
+    "PlayerStatus": {
+      "type": "string",
+      "enum": [
+        "paused",
+        "playing",
+        "stopped"
+      ]
+    },
+    "QueueSong": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "_uniqueId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "_uniqueId"
+      ],
+      "additionalProperties": true,
+      "description": "Partial schema: the upstream QueueSong is Song & {_uniqueId, optional _contextPlaylistId}; the full Song has many more required fields. Other properties are allowed."
+    },
+    "SongState": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "number"
+        },
+        "repeat": {
+          "$ref": "#/$defs/PlayerRepeat"
+        },
+        "shuffle": {
+          "type": "boolean"
+        },
+        "song": {
+          "$ref": "#/$defs/QueueSong"
+        },
+        "status": {
+          "$ref": "#/$defs/PlayerStatus"
+        },
+        "volume": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "additionalProperties": false,
+      "description": "All fields are optional in the upstream SongState type."
+    },
+    "RemoteTrackItem": {
+      "type": "object",
+      "properties": {
+        "album": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "artistName": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "id": {
+          "type": "string"
+        },
+        "imageUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "album",
+        "artistName",
+        "duration",
+        "id",
+        "imageUrl",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteAlbumItem": {
+      "type": "object",
+      "properties": {
+        "albumArtistName": {
+          "type": "string"
+        },
+        "duration": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "imageUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "releaseYear": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "songCount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "albumArtistName",
+        "duration",
+        "id",
+        "imageUrl",
+        "name",
+        "releaseYear",
+        "songCount"
+      ],
+      "additionalProperties": false
+    },
+    "RemotePlaylistItem": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "imageUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "songCount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "duration",
+        "id",
+        "imageUrl",
+        "name",
+        "songCount"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteQueueItem": {
+      "type": "object",
+      "properties": {
+        "album": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "artistName": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "id": {
+          "type": "string"
+        },
+        "imageUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "uniqueId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "album",
+        "artistName",
+        "duration",
+        "id",
+        "imageUrl",
+        "name",
+        "uniqueId"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteRadioItem": {
+      "type": "object",
+      "properties": {
+        "homepageUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "imageUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "homepageUrl",
+        "id",
+        "imageUrl",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteListResponse": {
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "type": "string"
+        },
+        "hasMore": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      "required": [
+        "requestId",
+        "hasMore",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "Server01": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "accent-color"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "dark": {
+              "type": "string"
+            },
+            "light": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "dark",
+            "light"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server02": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "confirm-queue-changes-setting"
+        },
+        "data": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server03": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "error"
+        },
+        "data": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server04": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "favorite"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "favorite": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id",
+            "favorite"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server05": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "rating"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "rating": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "rating"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server06": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "operation-ack"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "requestId": {
+              "type": "string"
+            },
+            "error": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "requestId"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false,
+      "description": "Successful acknowledgement omits error; returned to the requesting client only."
+    },
+    "Server07": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "playback"
+        },
+        "data": {
+          "$ref": "#/$defs/PlayerStatus"
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server08": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "position"
+        },
+        "data": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server09": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "proxy"
+        },
+        "data": {
+          "type": "string",
+          "description": "Base64-encoded artwork data returned by the proxy request."
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server10": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "queue-state"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "currentUniqueId": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/RemoteQueueItem"
+              }
+            }
+          },
+          "required": [
+            "currentUniqueId",
+            "items"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false,
+      "description": "Pushed state; not a request/response event."
+    },
+    "Server11": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "radio-status"
+        },
+        "data": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "isActive": {
+                  "const": true
+                },
+                "imageUrl": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "stationName": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "isActive",
+                "imageUrl",
+                "stationName"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "isActive": {
+                  "const": false
+                }
+              },
+              "required": [
+                "isActive"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server12": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "repeat"
+        },
+        "data": {
+          "$ref": "#/$defs/PlayerRepeat"
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server13": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "shuffle"
+        },
+        "data": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server14": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "song"
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QueueSong"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server15": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "state"
+        },
+        "data": {
+          "$ref": "#/$defs/SongState"
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server16": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "volume"
+        },
+        "data": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "Server17": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "tracks-response"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "hasMore": {
+              "type": "boolean"
+            },
+            "requestId": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/RemoteTrackItem"
+              }
+            }
+          },
+          "required": [
+            "hasMore",
+            "requestId",
+            "items"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false,
+      "description": "Response delivered only to the client that issued the matching *-request."
+    },
+    "Server18": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "albums-response"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "hasMore": {
+              "type": "boolean"
+            },
+            "requestId": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/RemoteAlbumItem"
+              }
+            }
+          },
+          "required": [
+            "hasMore",
+            "requestId",
+            "items"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false,
+      "description": "Response delivered only to the client that issued the matching *-request."
+    },
+    "Server19": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "playlists-response"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "hasMore": {
+              "type": "boolean"
+            },
+            "requestId": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/RemotePlaylistItem"
+              }
+            }
+          },
+          "required": [
+            "hasMore",
+            "requestId",
+            "items"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false,
+      "description": "Response delivered only to the client that issued the matching *-request."
+    },
+    "Server20": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "radio-response"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "hasMore": {
+              "type": "boolean"
+            },
+            "requestId": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/RemoteRadioItem"
+              }
+            }
+          },
+          "required": [
+            "hasMore",
+            "requestId",
+            "items"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "event",
+        "data"
+      ],
+      "additionalProperties": false,
+      "description": "Response delivered only to the client that issued the matching *-request."
+    }
+  }
+}
