@@ -39,13 +39,18 @@ class _CatalogSearchState extends State<CatalogSearch> {
     leading: const Icon(Icons.search),
     onChanged: widget.onChanged,
     trailing: [
-      IconButton(
-        tooltip: 'Clear search',
-        onPressed: () {
-          _controller.clear();
-          widget.onChanged('');
-        },
-        icon: const Icon(Icons.close),
+      ListenableBuilder(
+        listenable: _controller,
+        builder: (_, _) => _controller.text.isEmpty
+            ? const SizedBox.shrink()
+            : IconButton(
+                tooltip: 'Clear search',
+                onPressed: () {
+                  _controller.clear();
+                  widget.onChanged('');
+                },
+                icon: const Icon(Icons.close),
+              ),
       ),
     ],
   );

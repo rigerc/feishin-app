@@ -182,8 +182,10 @@ class _CatalogListState extends State<_CatalogList> {
             state.items.isEmpty,
             state.failed,
           )) {
-            (false, _, true, _) => const Center(
-              child: Text('Connect to load the library.'),
+            (false, _, true, _) => const EmptyState(
+              title: ValueConst.offlineLibrary,
+              subtitle: ValueConst.offlineLibraryDetail,
+              iconData: Icons.cloud_off_rounded,
             ),
             (_, true, true, _) => const Center(child: LoadingIndicator()),
             (_, _, true, false) => Center(
@@ -193,12 +195,12 @@ class _CatalogListState extends State<_CatalogList> {
                     : ValueConst.noResults,
                 subtitle: state.query.isEmpty
                     ? ValueConst.emptyTip
-                    : 'Try a different search.',
+                    : ValueConst.differentSearch,
                 iconData: Icons.library_music_outlined,
                 actions: _online
                     ? [
                         AppButton(
-                          label: 'Refresh',
+                          label: ValueConst.refresh,
                           onTap: () => _catalog.change(),
                         ),
                       ]
@@ -227,6 +229,9 @@ class _CatalogListState extends State<_CatalogList> {
       return MediaRow(
         key: ValueKey(item.id),
         track: item,
+        selected:
+            widget.category == Catalog.tracks &&
+            item.id == widget.session.playback.track?.id,
         url: widget.artwork(item),
         cache: widget.cache,
         onTap: _online ? () => widget.onItem(item) : null,
@@ -258,6 +263,7 @@ class _CatalogListState extends State<_CatalogList> {
               itemBuilder: (_, index) {
                 final track = state.items[index];
                 return InkWell(
+                  borderRadius: AppRadius.xl,
                   onTap: _online ? () => widget.onItem(track) : null,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,6 +287,9 @@ class _CatalogListState extends State<_CatalogList> {
                         track.artist,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
@@ -318,6 +327,7 @@ class MediaRow extends StatelessWidget {
     this.onTap,
     this.trailing,
     this.selected = false,
+    this.dimmed = false,
   });
 
   final Track track;
@@ -326,12 +336,13 @@ class MediaRow extends StatelessWidget {
   final VoidCallback? onTap;
   final Widget? trailing;
   final bool selected;
+  final bool dimmed;
 
   @override
-  Widget build(BuildContext context) => ListTile(
-    selected: selected,
-    selectedTileColor: Theme.of(context).colorScheme.secondaryContainer,
-    leading: SizedBox.square(
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final cover = SizedBox.square(
       dimension: AppSpacing.xl10,
       child: CoverImage(
         cache: cache,
@@ -339,29 +350,70 @@ class MediaRow extends StatelessWidget {
         pixels: 128,
         radius: AppRadius.md,
       ),
-    ),
-    title: Text(
-      track.name,
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-      style: Theme.of(
-        context,
-      ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
-    ),
-    subtitle: Text(
-      [
-        if (selected) ValueConst.playing,
-        if (track.artist.isNotEmpty) track.artist,
-        if (track.year case final int year when year > 0) '$year',
-        if (track.songCount case final int count) '$count tracks',
-        if (track.duration case final Duration duration) timeLabel(duration),
-      ].join(' · '),
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-    ),
-    onTap: onTap,
-    trailing: trailing,
-  );
+    );
+    return Semantics(
+      selected: selected,
+      child: ListTile(
+        selected: selected,
+        selectedColor: scheme.primary,
+        selectedTileColor: scheme.primary.withValues(alpha: .1),
+        leading: selected
+            ? Stack(
+                alignment: Alignment.center,
+                children: [
+                  cover,
+                  SizedBox.square(
+                    dimension: AppSpacing.xl10,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: scheme.surface.withValues(alpha: .6),
+                        borderRadius: AppRadius.md,
+                      ),
+                      child: Icon(
+                        Icons.graphic_eq_rounded,
+                        color: scheme.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : Opacity(opacity: dimmed ? .5 : 1, child: cover),
+        title: Text(
+          track.name,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: selected
+                ? scheme.primary
+                : dimmed
+                ? scheme.onSurfaceVariant
+                : null,
+          ),
+        ),
+        subtitle: Text(
+          [
+            if (track.artist.isNotEmpty) track.artist,
+            // Rows with a duration are songs; the year only earns its space
+            // on albums and playlists, where there's no duration to show.
+            if (track.year case final int year
+                when year > 0 && track.duration == null)
+              '$year',
+            if (track.songCount case final int count) '$count tracks',
+            if (track.duration case final Duration duration)
+              timeLabel(duration),
+          ].join(' · '),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: scheme.onSurfaceVariant,
+          ),
+        ),
+        onTap: onTap,
+        trailing: trailing,
+      ),
+    );
+  }
 }
 
 class QueueView extends StatefulWidget {
@@ -405,14 +457,38 @@ class _QueueViewState extends State<QueueView> {
               ? ValueConst.queueUnavailable
               : ValueConst.noQueue,
           iconData: Icons.queue_music,
-          actions: [AppButton(label: 'Browse library', onTap: widget.onBrowse)],
+          actions: [
+            AppButton(label: ValueConst.browseLibrary, onTap: widget.onBrowse),
+          ],
         ),
       );
     }
     final items = queue.items;
+    final current = items.indexWhere(
+      (item) => item.occurrence == queue.current,
+    );
+    final total = items.fold(
+      Duration.zero,
+      (sum, item) => sum + (item.track.duration ?? Duration.zero),
+    );
+    final theme = Theme.of(context);
     return QueueReorderList(
       count: items.length,
       padding: EdgeInsets.only(bottom: widget.bottomInset),
+      header: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.xl4,
+          AppSpacing.xs,
+          AppSpacing.xl4,
+          AppSpacing.xs,
+        ),
+        child: Text(
+          ValueConst.queueSummary(items.length, total),
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ),
       start: (_) => _dragQueue = queue,
       reorder: (from, to) {
         if (!widget.enabled || !identical(queue, _dragQueue)) return;
@@ -431,7 +507,9 @@ class _QueueViewState extends State<QueueView> {
           track: item.track,
           url: widget.artwork(item.track),
           cache: widget.cache,
-          selected: queue.current == item.occurrence,
+          selected: index == current,
+          // Tracks before the current one have already played.
+          dimmed: current >= 0 && index < current,
           onTap: widget.enabled ? () => widget.onJump(item) : null,
           trailing: Row(
             mainAxisSize: MainAxisSize.min,

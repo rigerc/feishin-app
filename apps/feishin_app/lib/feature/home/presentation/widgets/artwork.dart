@@ -165,6 +165,22 @@ class _CoverImageState extends State<CoverImage> {
                     ),
                     fit: BoxFit.cover,
                     excludeFromSemantics: true,
+                    // Keep the placeholder up while the bytes decode instead
+                    // of flashing an empty frame, then fade the cover in.
+                    frameBuilder: (_, child, frame, synchronous) => synchronous
+                        ? child
+                        : Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              placeholder,
+                              AnimatedOpacity(
+                                opacity: frame == null ? 0 : 1,
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeOut,
+                                child: child,
+                              ),
+                            ],
+                          ),
                     errorBuilder: (_, _, _) => placeholder,
                   );
           },

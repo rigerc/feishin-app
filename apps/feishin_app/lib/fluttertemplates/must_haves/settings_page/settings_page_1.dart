@@ -9,19 +9,37 @@ class SettingsSection extends StatelessWidget {
   final List<Widget> rows;
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.md,
-          AppSpacing.lg,
-          AppSpacing.md,
-          AppSpacing.sm,
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.xl2,
+            AppSpacing.lg,
+            AppSpacing.xs,
+          ),
+          child: Text(
+            title,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
-        child: Text(title, style: Theme.of(context).textTheme.titleSmall),
-      ),
-      ...rows,
-    ],
-  );
+        Card(
+          margin: EdgeInsets.zero,
+          elevation: 0,
+          color: theme.colorScheme.surfaceContainerLow,
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: rows,
+          ),
+        ),
+      ],
+    );
+  }
 }

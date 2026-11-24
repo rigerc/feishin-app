@@ -44,7 +44,7 @@ class _ConnectionFormState extends State<ConnectionForm> {
   late bool _remember = widget.profile?.rememberPassword ?? true;
   bool _hidePassword = true;
   bool _testing = false;
-  String? _result;
+  ({String message, bool ok})? _result;
 
   @override
   void dispose() {
@@ -86,7 +86,10 @@ class _ConnectionFormState extends State<ConnectionForm> {
     if (mounted) {
       setState(() {
         _testing = false;
-        _result = error ?? 'Feishin responded. You can save this profile.';
+        _result = (
+          message: error ?? 'Feishin responded. You can save this profile.',
+          ok: error == null,
+        );
       });
     }
   }
@@ -106,9 +109,18 @@ class _ConnectionFormState extends State<ConnectionForm> {
               value?.trim().isEmpty ?? true ? 'Enter a name.' : null,
         ),
         SegmentedButton<bool>(
+          showSelectedIcon: false,
           segments: const [
-            ButtonSegment(value: false, label: Text(ValueConst.lan)),
-            ButtonSegment(value: true, label: Text(ValueConst.encrypted)),
+            ButtonSegment(
+              value: false,
+              icon: Icon(Icons.wifi_rounded),
+              label: Text(ValueConst.lan),
+            ),
+            ButtonSegment(
+              value: true,
+              icon: Icon(Icons.lock_outline_rounded),
+              label: Text(ValueConst.encrypted),
+            ),
           ],
           selected: {_encrypted},
           onSelectionChanged: (selection) => setState(() {
@@ -133,9 +145,24 @@ class _ConnectionFormState extends State<ConnectionForm> {
               : null,
         ),
         if (!_encrypted)
-          Text(
-            ValueConst.lanNotice,
-            style: Theme.of(context).textTheme.bodySmall,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: AppSpacing.xs,
+            children: [
+              Icon(
+                Icons.info_outline_rounded,
+                size: AppSpacing.lg,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              Expanded(
+                child: Text(
+                  ValueConst.lanNotice,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
           ),
         TextFormField(
           controller: _username,
@@ -170,8 +197,23 @@ class _ConnectionFormState extends State<ConnectionForm> {
           value: _remember,
           onChanged: (value) => setState(() => _remember = value),
         ),
-        if (_result case final String message)
-          Semantics(liveRegion: true, child: Text(message)),
+        if (_result case (:final message, :final ok))
+          Semantics(
+            liveRegion: true,
+            child: Row(
+              spacing: AppSpacing.xs,
+              children: [
+                Icon(
+                  ok ? Icons.check_circle_rounded : Icons.error_outline_rounded,
+                  size: AppSpacing.xl2,
+                  color: ok
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.error,
+                ),
+                Expanded(child: Text(message)),
+              ],
+            ),
+          ),
         AppButton(
           label: 'Test connection',
           variant: AppButtonVariant.secondary,

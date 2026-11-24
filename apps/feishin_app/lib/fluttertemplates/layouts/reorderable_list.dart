@@ -9,6 +9,7 @@ class QueueReorderList extends StatelessWidget {
     required this.reorder,
     required this.start,
     required this.padding,
+    this.header,
   });
 
   final int count;
@@ -16,11 +17,13 @@ class QueueReorderList extends StatelessWidget {
   final ReorderCallback reorder;
   final ValueChanged<int> start;
   final EdgeInsets padding;
+  final Widget? header;
 
   @override
   Widget build(BuildContext context) => ReorderableListView.builder(
     buildDefaultDragHandles: false,
     padding: padding,
+    header: header,
     itemCount: count,
     itemBuilder: row,
     onReorderItem: reorder,

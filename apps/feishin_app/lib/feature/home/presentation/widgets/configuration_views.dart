@@ -1,4 +1,6 @@
+import 'package:core/core/theme/app_radius.dart';
 import 'package:core/core/theme/app_spacing.dart';
+import 'package:core/core/ui/atoms/badge.dart';
 import 'package:core/core/ui/atoms/button.dart';
 import 'package:core/core/ui/atoms/dropdown_menu.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,7 @@ class ProfilesView extends StatelessWidget {
     super.key,
     required this.state,
     required this.add,
+    required this.create,
     required this.test,
     required this.edit,
     required this.select,
@@ -25,6 +28,7 @@ class ProfilesView extends StatelessWidget {
 
   final HomeReady state;
   final void Function(String, Uri, String, String, bool) add;
+  final VoidCallback create;
   final Future<String?> Function(Uri endpoint, String username, String password)
   test;
   final ValueChanged<RemoteProfile> edit;
@@ -33,68 +37,187 @@ class ProfilesView extends StatelessWidget {
   final VoidCallback disconnect;
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 540),
-      child: ListView(
-        padding: const EdgeInsets.all(AppSpacing.xl4),
-        children: [
-          Text(
-            ValueConst.connect,
-            style: Theme.of(context).textTheme.headlineSmall,
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final onboarding = state.profiles.isEmpty;
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 540),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.xl4,
+            AppSpacing.base,
+            AppSpacing.xl4,
+            AppSpacing.xl6,
           ),
-          const SizedBox(height: AppSpacing.base),
-          const Text(ValueConst.connectInstruction),
-          const SizedBox(height: AppSpacing.xl4),
-          for (final profile in state.profiles)
-            Card(
-              child: ListTile(
-                title: Text(profile.name),
-                subtitle: Text(profile.endpoint.authority),
-                selected: state.activeProfile == profile.id,
-                onTap: state.saving ? null : () => select(profile),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      tooltip: 'Edit ${profile.name}',
-                      onPressed: state.saving ? null : () => edit(profile),
-                      icon: const Icon(Icons.edit_outlined),
+          children: [
+            if (onboarding) ...[
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: scheme.primaryContainer,
+                    borderRadius: AppRadius.xl,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Icon(
+                      Icons.settings_remote_rounded,
+                      size: AppSpacing.xl6,
+                      color: scheme.onPrimaryContainer,
                     ),
-                    IconButton(
-                      tooltip: 'Remove ${profile.name}',
-                      onPressed: state.saving ? null : () => remove(profile),
-                      icon: const Icon(Icons.delete_outline),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          if (state.activeProfile != null)
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: AppButton(
-                label: ValueConst.disconnect,
-                variant: AppButtonVariant.text,
-                onTap: disconnect,
+              const SizedBox(height: AppSpacing.xl2),
+              Text(
+                ValueConst.connect,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
-          if (state.profiles.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-              child: Text(
-                'Add a desktop',
-                style: Theme.of(context).textTheme.titleMedium,
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                ValueConst.connectInstruction,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
               ),
+              const SizedBox(height: AppSpacing.xl4),
+              IgnorePointer(
+                ignoring: state.saving,
+                child: ConnectionForm(onSave: add, onTest: test),
+              ),
+            ] else ...[
+              SettingsSection(
+                title: ValueConst.savedDesktops,
+                rows: [
+                  for (final profile in state.profiles)
+                    _ProfileTile(
+                      profile: profile,
+                      active: state.activeProfile == profile.id,
+                      connection: state.session.connection,
+                      enabled: !state.saving,
+                      select: () => select(profile),
+                      edit: () => edit(profile),
+                      remove: () => remove(profile),
+                    ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xl2),
+              Wrap(
+                spacing: AppSpacing.xs,
+                runSpacing: AppSpacing.xs,
+                children: [
+                  AppButton(
+                    label: ValueConst.addDesktop,
+                    variant: AppButtonVariant.secondary,
+                    leadingIcon: const Icon(Icons.add_rounded),
+                    state: state.saving
+                        ? AppButtonState.disabled
+                        : AppButtonState.idle,
+                    onTap: create,
+                  ),
+                  if (state.activeProfile != null)
+                    AppButton(
+                      label: ValueConst.disconnect,
+                      variant: AppButtonVariant.text,
+                      leadingIcon: const Icon(Icons.link_off_rounded),
+                      onTap: disconnect,
+                    ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileTile extends StatelessWidget {
+  const _ProfileTile({
+    required this.profile,
+    required this.active,
+    required this.connection,
+    required this.enabled,
+    required this.select,
+    required this.edit,
+    required this.remove,
+  });
+
+  final RemoteProfile profile;
+  final bool active;
+  final Connection connection;
+  final bool enabled;
+  final VoidCallback select;
+  final VoidCallback edit;
+  final VoidCallback remove;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final encrypted = profile.endpoint.scheme == 'wss';
+    final online = active && connection == Connection.connected;
+    return ListTile(
+      selected: active,
+      selectedColor: scheme.onSurface,
+      contentPadding: const EdgeInsetsDirectional.only(
+        start: AppSpacing.lg,
+        end: AppSpacing.xs,
+      ),
+      isThreeLine: active,
+      leading: Tooltip(
+        message: encrypted ? ValueConst.encrypted : ValueConst.lan,
+        child: CircleAvatar(
+          backgroundColor: active
+              ? scheme.primaryContainer
+              : scheme.surfaceContainerHighest,
+          foregroundColor: active
+              ? scheme.onPrimaryContainer
+              : scheme.onSurfaceVariant,
+          child: Icon(
+            encrypted ? Icons.lock_outline_rounded : Icons.computer_rounded,
+          ),
+        ),
+      ),
+      title: Text(profile.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: AppSpacing.xs3,
+        children: [
+          Text(
+            profile.endpoint.authority,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          if (active)
+            AppBadge(
+              text: online ? ValueConst.connected : ValueConst.active,
+              intent: online ? AppBadgeIntent.success : AppBadgeIntent.neutral,
+              size: AppBadgeSize.small,
             ),
-          IgnorePointer(
-            ignoring: state.saving,
-            child: ConnectionForm(onSave: add, onTest: test),
+        ],
+      ),
+      onTap: enabled ? select : null,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            tooltip: 'Edit ${profile.name}',
+            onPressed: enabled ? edit : null,
+            icon: const Icon(Icons.edit_outlined),
+          ),
+          IconButton(
+            tooltip: 'Remove ${profile.name}',
+            onPressed: enabled ? remove : null,
+            icon: const Icon(Icons.delete_outline),
           ),
         ],
       ),
-    ),
-  );
+    );
+  }
 }
 
 class SettingsView extends StatelessWidget {
@@ -120,13 +243,25 @@ class SettingsView extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 640),
         child: ListView(
-          padding: const EdgeInsets.only(bottom: AppSpacing.xl6),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.xs,
+            AppSpacing.lg,
+            AppSpacing.xl6,
+          ),
           children: [
             SettingsSection(
               title: ValueConst.connections,
               rows: [
                 ListTile(
-                  title: const Text('Saved desktops'),
+                  title: const Text(ValueConst.savedDesktops),
+                  subtitle: Text(
+                    state.profiles
+                            .where((item) => item.id == state.activeProfile)
+                            .firstOrNull
+                            ?.name ??
+                        ValueConst.disconnected,
+                  ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: openProfiles,
                 ),
@@ -194,14 +329,7 @@ class SettingsView extends StatelessWidget {
             SettingsSection(
               title: 'Waveform',
               rows: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                  ),
-                  child: Card(
-                    child: _TimelinePreview(preferences: preferences),
-                  ),
-                ),
+                _TimelinePreview(preferences: preferences),
                 _choice(
                   'Seekbar style',
                   TimelineStyle.values,
@@ -356,7 +484,12 @@ class _TimelinePreviewState extends State<_TimelinePreview> {
     padding: const EdgeInsets.all(AppSpacing.base),
     child: Column(
       children: [
-        const Text('Live preview'),
+        Text(
+          'Live preview',
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
         Timeline(
           snapshot: PlaybackSnapshot(track: _track, position: _time),
           generation: 0,

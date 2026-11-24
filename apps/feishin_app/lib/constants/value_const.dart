@@ -8,8 +8,8 @@ class ValueConst {
   static const connect = 'Connect to Feishin';
   static const connectInstruction =
       'Enable Remote Control in Feishin desktop, then enter its network address.';
-  static const lan = 'Trusted local network';
-  static const encrypted = 'Encrypted WSS';
+  static const lan = 'Local network';
+  static const encrypted = 'Encrypted';
   static const lanNotice =
       'The address and credentials travel unencrypted. Use this option on a network you trust.';
   static const profileName = 'Profile name';
@@ -46,4 +46,36 @@ class ValueConst {
   static const artworkTrust = 'Allow artwork from other hosts';
   static const artworkTrustHint =
       'Feishin may return covers hosted on your music server.';
+  static const browseLibrary = 'Browse library';
+  static const offlineLibrary = 'Not connected';
+  static const offlineLibraryDetail =
+      'Connect to a Feishin desktop to browse its library.';
+  static const differentSearch = 'Try a different search.';
+  static const refresh = 'Refresh';
+  static const nowPlayingBadge = 'Now playing';
+  static const play = 'Play';
+  static const pause = 'Pause';
+  static const next = 'Next track';
+  static const previous = 'Previous track';
+  static const shuffle = 'Shuffle';
+  static const addFavorite = 'Add favorite';
+  static const removeFavorite = 'Remove favorite';
+  static const trackRating = 'Track rating';
+  static const savedDesktops = 'Saved desktops';
+  static const addDesktop = 'Add a desktop';
+  static const active = 'Active';
+  static const connected = 'Connected';
+  static const connecting = 'Connecting to Feishin…';
+  static const reconnecting = 'Reconnecting…';
+  static const authFailed = 'Authentication failed';
+  static const disconnected = 'Disconnected';
+  static String repeat(String mode) => 'Repeat: $mode';
+  static String volumePercent(double value) => '${value.round()} percent';
+  static String queueSummary(int count, Duration total) {
+    final minutes = total.inMinutes;
+    final length = minutes >= 60
+        ? '${minutes ~/ 60} h ${minutes % 60} min'
+        : '$minutes min';
+    return '$count ${count == 1 ? 'track' : 'tracks'} · $length';
+  }
 }

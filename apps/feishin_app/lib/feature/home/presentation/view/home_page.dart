@@ -3,6 +3,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:core/core/base/base_page.dart';
 import 'package:core/core/base/base_screen.dart';
+import 'package:core/core/theme/app_radius.dart';
 import 'package:core/core/theme/app_spacing.dart';
 import 'package:core/core/ui/atoms/button.dart';
 import 'package:core/core/ui/atoms/loading_indicator.dart';
@@ -135,19 +136,6 @@ class _HomeScreenState extends BaseScreenState<_HomeScreen>
           : null;
     }
 
-    final player = NowPlaying(
-      session: state.session,
-      repository: _remote,
-      cache: _cache,
-      artwork: state.session.playback.track == null
-          ? null
-          : artwork(state.session.playback.track!),
-      preferences: state.preferences,
-      browse: () => _open(Destination.library),
-      queue: () => _open(Destination.queue, from: Destination.playing),
-      volume: _volume,
-      rating: () => _rate(state.session),
-    );
     final title = switch (destination) {
       Destination.playing => ValueConst.playing,
       Destination.library => ValueConst.library,
@@ -181,6 +169,76 @@ class _HomeScreenState extends BaseScreenState<_HomeScreen>
           final wide =
               constraints.maxWidth >= 1000 && constraints.maxHeight >= 460;
           final showPlayerPane = wide && usingShell;
+          final leading = switch (destination) {
+            Destination.playing => IconButton(
+              tooltip: 'Open library',
+              onPressed: () => _open(Destination.library),
+              icon: const Icon(Icons.keyboard_arrow_down),
+            ),
+            Destination.settings ||
+            Destination.profiles when profile != null => IconButton(
+              tooltip: 'Back',
+              onPressed: () => _open(_backTarget(state)),
+              icon: const BackButtonIcon(),
+            ),
+            _ => null,
+          };
+          final top = Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _RemoteHeader(
+                title: title,
+                desktop: profile?.name,
+                connection: profile == null ? null : state.session.connection,
+                centered: destination == Destination.playing,
+                leading: leading,
+                actions: [
+                  if (destination == Destination.queue)
+                    IconButton(
+                      tooltip: ValueConst.clearQueue,
+                      icon: const Icon(Icons.playlist_remove_rounded),
+                      onPressed:
+                          online &&
+                              !_busy &&
+                              (state.session.playback.queue?.items.isNotEmpty ??
+                                  false)
+                          ? () => _clear(state.session)
+                          : null,
+                    ),
+                  if (destination != Destination.settings &&
+                      destination != Destination.profiles)
+                    IconButton(
+                      tooltip: ValueConst.settings,
+                      icon: const Icon(Icons.settings_outlined),
+                      onPressed: () =>
+                          _open(Destination.settings, from: destination),
+                    ),
+                ],
+              ),
+              _ConnectionBanner(
+                state: state,
+                openProfiles: () =>
+                    _open(Destination.profiles, from: destination),
+                retry: () => _bloc.add(const HomeEvent.reconnect()),
+              ),
+            ],
+          );
+          // On Now Playing the header sits on the artwork backdrop instead of
+          // a separate band above it.
+          final immersive = destination == Destination.playing;
+          final player = NowPlaying(
+            session: state.session,
+            repository: _remote,
+            cache: _cache,
+            artwork: state.session.playback.track == null
+                ? null
+                : artwork(state.session.playback.track!),
+            preferences: state.preferences,
+            browse: () => _open(Destination.library),
+            queue: () => _open(Destination.queue, from: Destination.playing),
+            rating: () => _rate(state.session),
+            header: immersive ? top : null,
+          );
           final track = usingShell && !showPlayerPane
               ? state.session.playback.track
               : null;
@@ -234,6 +292,7 @@ class _HomeScreenState extends BaseScreenState<_HomeScreen>
                 state: state,
                 add: (name, endpoint, username, password, remember) =>
                     _save(name, endpoint, username, password, remember),
+                create: _create,
                 test: _testConnection,
                 edit: _edit,
                 select: (profile) =>
@@ -243,56 +302,9 @@ class _HomeScreenState extends BaseScreenState<_HomeScreen>
               ),
             ],
           );
-          final leading = switch (destination) {
-            Destination.playing => IconButton(
-              tooltip: 'Open library',
-              onPressed: () => _open(Destination.library),
-              icon: const Icon(Icons.keyboard_arrow_down),
-            ),
-            Destination.settings ||
-            Destination.profiles when profile != null => IconButton(
-              tooltip: 'Back',
-              onPressed: () => _open(_backTarget(state)),
-              icon: const BackButtonIcon(),
-            ),
-            _ => null,
-          };
           return Column(
             children: [
-              _RemoteHeader(
-                title: title,
-                desktop: profile?.name,
-                centered: destination == Destination.playing,
-                leading: leading,
-                actions: [
-                  if (destination == Destination.queue)
-                    IconButton(
-                      tooltip: ValueConst.clearQueue,
-                      icon: const Icon(Icons.playlist_remove_rounded),
-                      onPressed:
-                          online &&
-                              !_busy &&
-                              (state.session.playback.queue?.items.isNotEmpty ??
-                                  false)
-                          ? () => _clear(state.session)
-                          : null,
-                    ),
-                  if (destination != Destination.settings &&
-                      destination != Destination.profiles)
-                    IconButton(
-                      tooltip: ValueConst.settings,
-                      icon: const Icon(Icons.settings_outlined),
-                      onPressed: () =>
-                          _open(Destination.settings, from: destination),
-                    ),
-                ],
-              ),
-              _ConnectionBanner(
-                state: state,
-                openProfiles: () =>
-                    _open(Destination.profiles, from: destination),
-                retry: () => _bloc.add(const HomeEvent.reconnect()),
-              ),
+              if (!immersive) top,
               Expanded(
                 child: Row(
                   children: [
@@ -339,6 +351,11 @@ class _HomeScreenState extends BaseScreenState<_HomeScreen>
                                 playback: state.session.playback,
                                 blurred: blurred,
                                 open: () => _open(Destination.playing),
+                                next: online
+                                    ? () => _remote.transport(
+                                        TransportAction.next,
+                                      )
+                                    : null,
                                 toggle: online
                                     ? () => _remote.transport(
                                         state.session.playback.status ==
@@ -450,6 +467,19 @@ class _HomeScreenState extends BaseScreenState<_HomeScreen>
       ),
     );
   }
+
+  Future<void> _create() => showAppBottomSheet<void>(
+    title: ValueConst.addDesktop,
+    child: Builder(
+      builder: (sheet) => ConnectionForm(
+        onTest: _testConnection,
+        onSave: (name, endpoint, username, password, remember) {
+          Navigator.pop(sheet);
+          _save(name, endpoint, username, password, remember);
+        },
+      ),
+    ),
+  );
 
   Future<void> _remove(RemoteProfile profile) async {
     if (await _confirm('Remove desktop?', profile.name, ValueConst.remove) &&
@@ -657,25 +687,13 @@ class _HomeScreenState extends BaseScreenState<_HomeScreen>
       _remote.rate(chosen);
     }
   }
-
-  void _volume() {
-    final generation = _remote.state.generation;
-    showAppBottomSheet<void>(
-      title: ValueConst.volume,
-      child: _VolumeControl(
-        initial: _remote.state.playback.volume,
-        change: (value) {
-          if (generation == _remote.state.generation) _remote.setVolume(value);
-        },
-      ),
-    );
-  }
 }
 
 class _RemoteHeader extends StatelessWidget {
   const _RemoteHeader({
     required this.title,
     required this.desktop,
+    required this.connection,
     required this.centered,
     required this.leading,
     required this.actions,
@@ -683,6 +701,7 @@ class _RemoteHeader extends StatelessWidget {
 
   final String title;
   final String? desktop;
+  final Connection? connection;
   final bool centered;
   final Widget? leading;
   final List<Widget> actions;
@@ -690,6 +709,7 @@ class _RemoteHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final info = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: centered
@@ -710,13 +730,32 @@ class _RemoteHeader extends StatelessWidget {
                   ),
         ),
         if (desktop case final String name)
-          Text(
-            name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: AppSpacing.xs2,
+            children: [
+              if (connection case final Connection status)
+                Tooltip(
+                  message: status.label,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: status.tone(scheme),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const SizedBox.square(dimension: AppSpacing.xs),
+                  ),
+                ),
+              Flexible(
+                child: Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
           ),
       ],
     );
@@ -749,6 +788,7 @@ class _MiniPlayer extends StatelessWidget {
     required this.open,
     required this.blurred,
     required this.toggle,
+    required this.next,
   });
 
   final Track track;
@@ -757,8 +797,8 @@ class _MiniPlayer extends StatelessWidget {
   final PlaybackSnapshot playback;
   final VoidCallback open;
   final bool blurred;
-
   final VoidCallback? toggle;
+  final VoidCallback? next;
 
   static double heightOf(BuildContext context, Track track) {
     final scaler = MediaQuery.textScalerOf(context);
@@ -794,6 +834,16 @@ class _MiniPlayer extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (duration > 0)
+            ExcludeSemantics(
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: AppSpacing.xs4,
+                borderRadius: BorderRadius.zero,
+                backgroundColor: colors.outlineVariant.withValues(alpha: .5),
+                color: colors.primary,
+              ),
+            ),
           Expanded(
             child: Row(
               children: [
@@ -845,27 +895,23 @@ class _MiniPlayer extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  tooltip: isPlaying ? 'Pause' : 'Play',
+                  tooltip: isPlaying ? ValueConst.pause : ValueConst.play,
                   onPressed: toggle,
                   iconSize: AppSpacing.xl4,
                   icon: Icon(
                     isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                   ),
                 ),
+                IconButton(
+                  tooltip: ValueConst.next,
+                  onPressed: next,
+                  iconSize: AppSpacing.xl4,
+                  icon: const Icon(Icons.skip_next_rounded),
+                ),
                 const SizedBox(width: AppSpacing.xs3),
               ],
             ),
           ),
-          if (duration > 0)
-            ExcludeSemantics(
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: AppSpacing.xs4,
-                borderRadius: BorderRadius.zero,
-                backgroundColor: colors.outlineVariant,
-                color: colors.primary,
-              ),
-            ),
         ],
       ),
     );
@@ -877,36 +923,6 @@ class _MiniPlayer extends StatelessWidget {
       ),
     );
   }
-}
-
-class _VolumeControl extends StatefulWidget {
-  const _VolumeControl({required this.initial, required this.change});
-
-  final double initial;
-  final ValueChanged<double> change;
-
-  @override
-  State<_VolumeControl> createState() => _VolumeControlState();
-}
-
-class _VolumeControlState extends State<_VolumeControl> {
-  late double _value = widget.initial;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Text('${_value.round()}%'),
-      Slider(
-        value: _value,
-        max: 100,
-        divisions: 100,
-        onChanged: (value) => setState(() => _value = value),
-        onChangeEnd: widget.change,
-        semanticFormatterCallback: (value) => '${value.round()} percent',
-      ),
-    ],
-  );
 }
 
 class _ConnectionBanner extends StatelessWidget {
@@ -929,43 +945,108 @@ class _ConnectionBanner extends StatelessWidget {
                 state.activeProfile == null)) {
       return const SizedBox.shrink();
     }
-    final label =
-        state.message ??
-        state.session.notice ??
-        switch (status) {
-          Connection.connecting => 'Connecting to Feishin…',
-          Connection.reconnecting => 'Reconnecting…',
-          Connection.authFailed => 'Authentication failed',
-          Connection.disconnected => 'Disconnected',
-          Connection.connected => 'Connected',
-        };
-    return Material(
-      color: Theme.of(context).colorScheme.surfaceContainerHigh,
-      child: ListTile(
-        title: Semantics(liveRegion: true, child: Text(label)),
-        trailing: status == Connection.connecting || state.saving
-            ? const SizedBox.square(
-                dimension: AppSpacing.xl4,
-                child: LoadingIndicator(),
-              )
-            : Wrap(
-                children: [
+    final label = state.message ?? state.session.notice ?? status.label;
+    final scheme = Theme.of(context).colorScheme;
+    final failed = state.message != null || status == Connection.authFailed;
+    final (background, foreground) = failed
+        ? (scheme.errorContainer, scheme.onErrorContainer)
+        : switch (status) {
+            Connection.connecting || Connection.reconnecting => (
+              scheme.tertiaryContainer,
+              scheme.onTertiaryContainer,
+            ),
+            _ => (scheme.surfaceContainerHighest, scheme.onSurface),
+          };
+    final icon = switch (status) {
+      _ when state.message != null => Icons.error_outline_rounded,
+      Connection.authFailed => Icons.lock_outline_rounded,
+      Connection.connecting || Connection.reconnecting => Icons.sync_rounded,
+      Connection.disconnected => Icons.cloud_off_rounded,
+      Connection.connected => Icons.info_outline_rounded,
+    };
+    final working =
+        status == Connection.connecting ||
+        status == Connection.reconnecting ||
+        state.saving;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.xs,
+      ),
+      child: Material(
+        color: background,
+        borderRadius: AppRadius.lg,
+        child: IconTheme.merge(
+          data: IconThemeData(color: foreground),
+          child: Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(
+              AppSpacing.lg,
+              AppSpacing.xs3,
+              AppSpacing.xs3,
+              AppSpacing.xs3,
+            ),
+            child: Row(
+              spacing: AppSpacing.base,
+              children: [
+                Icon(icon, size: AppSpacing.xl2),
+                Expanded(
+                  child: Semantics(
+                    liveRegion: true,
+                    child: Text(
+                      label,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: foreground),
+                    ),
+                  ),
+                ),
+                if (working && status != Connection.reconnecting)
+                  const Padding(
+                    padding: EdgeInsets.all(AppSpacing.base),
+                    child: SizedBox.square(
+                      dimension: AppSpacing.xl2,
+                      child: LoadingIndicator(),
+                    ),
+                  )
+                else ...[
                   if (state.activeProfile != null &&
                       status != Connection.authFailed)
                     IconButton(
                       tooltip: ValueConst.retry,
                       onPressed: retry,
-                      icon: const Icon(Icons.refresh),
+                      icon: const Icon(Icons.refresh_rounded),
                     ),
                   if (state.destination != Destination.profiles)
                     IconButton(
                       tooltip: ValueConst.connections,
                       onPressed: openProfiles,
-                      icon: const Icon(Icons.link),
+                      icon: const Icon(Icons.link_rounded),
                     ),
                 ],
-              ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
+}
+
+extension on Connection {
+  String get label => switch (this) {
+    Connection.connecting => ValueConst.connecting,
+    Connection.reconnecting => ValueConst.reconnecting,
+    Connection.authFailed => ValueConst.authFailed,
+    Connection.disconnected => ValueConst.disconnected,
+    Connection.connected => ValueConst.connected,
+  };
+
+  Color tone(ColorScheme scheme) => switch (this) {
+    Connection.connected => scheme.primary,
+    Connection.connecting || Connection.reconnecting => scheme.tertiary,
+    Connection.authFailed => scheme.error,
+    Connection.disconnected => scheme.outline,
+  };
 }
